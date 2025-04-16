@@ -1,0 +1,47 @@
+name: 🚀 Deploy to VPS via SSH Log
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: 🛠 Deploy on VPS
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - name: 📦 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm install
+
+      - name: 🏗 Build Angular project
+        run: npm run build -- --configuration=production
+
+      - name: 🔐 Setup SSH Access
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p 8822 62.72.13.2 >> ~/.ssh/known_hosts
+
+      - name: 📤 Upload Angular build via SCP
+        run: |
+          scp -P 8822 -r dist/angular_backend/browser/* superadmin@62.72.13.2:/var/www/angular_backend/
+
+      - name: 🔁 Restart NGINX (optional, if needed)
+        run: |
+          ssh -p 8822 superadmin@62.72.13.2 "sudo systemctl restart nginx"
