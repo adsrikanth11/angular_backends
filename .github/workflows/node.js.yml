@@ -25,12 +25,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      - name: 📦 Install dependencies
-        run: npm install
-
-      - name: 🏗 Build Angular project
-        run: npm run build -- --configuration=production
-
       - name: 🔐 Setup SSH Access
         run: |
           mkdir -p ~/.ssh
