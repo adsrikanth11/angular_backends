@@ -21,10 +21,8 @@ jobs:
 
       - name: 📤 Upload Angular build via SCP
         run: |
-          ssh -p 8822 superadmin@62.72.13.2 << EOF
-            scp -P 8822 -r dist/angular_backend/browser/* superadmin@62.72.13.2:/var/www/angular_backend/
-          EOF
+          scp -P 8822 -r dist/angular_backend/browser/* superadmin@62.72.13.2:/var/www/angular_backend/
 
-      - name: 🔁 Restart NGINX (optional, if needed)
+      - name: 🔁 Restart NGINX
         run: |
           ssh -p 8822 superadmin@62.72.13.2 "sudo systemctl restart nginx"
