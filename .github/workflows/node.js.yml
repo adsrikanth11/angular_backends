@@ -12,14 +12,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🔐 Setup SSH Access
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p 8822 62.72.13.2 >> ~/.ssh/known_hosts
 
-      - name: 📤 Upload Angular build via SCP
+      - name: 📤 Upload committed dist files to VPS
         run: |
           scp -P 8822 -r dist/angular_backend/browser/* superadmin@62.72.13.2:/var/www/angular_backend/
 
