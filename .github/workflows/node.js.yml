@@ -30,8 +30,8 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p 8822 62.72.13.2 >> ~/.ssh/known_hosts
 
-          - name: 📤 Upload build files to temp folder
-          run: |
+      - name: 📤 Upload build files to temp folder
+        run: |
             ssh -p 8822 superadmin@62.72.13.2 "mkdir -p /home/superadmin/temp_deploy/"
             scp -P 8822 -r dist/angular_backend/browser/* superadmin@62.72.13.2:/home/superadmin/temp_deploy/
         
