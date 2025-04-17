@@ -1,25 +1,36 @@
-name: 🚀 Deploy to VPS via SSH
+name: 🚀 Deploy Angular to VPS
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
 jobs:
   deploy:
-    name: 🛠 Deploy on VPS
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🔐 Setup SSH Access
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: 📦 Install dependencies
+        run: npm install
+
+      - name: 🛠 Build Angular app
+        run: npm run build -- --configuration production
+
+      - name: 🔐 Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p 8822 62.72.13.2 >> ~/.ssh/known_hosts
 
-      - name: 📤 Upload Angular build via SCP
+      - name: 📤 Upload built files to VPS
         run: |
           scp -P 8822 -r dist/angular_backend/browser/* superadmin@62.72.13.2:/var/www/angular_backend/
 
