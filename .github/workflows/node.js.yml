@@ -1,4 +1,4 @@
-name: 🚀 Deploy Angular to VPS
+name: 🚀 Deploy to VPS via SSH
 
 on:
   push:
@@ -6,22 +6,12 @@ on:
 
 jobs:
   deploy:
+    name: 🛠 Deploy on VPS
     runs-on: ubuntu-latest
 
     steps:
-      - name: ⬇️ Checkout code
-        uses: actions/checkout@v4
-
-      - name: 🟢 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18.x
-
-      - name: 📦 Install dependencies
-        run: npm install
-
-      - name: 🏗 Build Angular project
-        run: npm run build -- --configuration=production
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v3
 
       - name: 🔐 Setup SSH Access
         run: |
@@ -30,20 +20,19 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p 8822 62.72.13.2 >> ~/.ssh/known_hosts
 
-      - name: 📤 Upload build files to temp folder
+      - name: 📤 Upload dist to temp folder on VPS
         run: |
-            ssh -p 8822 superadmin@62.72.13.2 "mkdir -p /home/superadmin/temp_deploy/"
-            scp -P 8822 -r dist/angular_backend/browser/* superadmin@62.72.13.2:/home/superadmin/temp_deploy/
-        
-      - name: 🚚 Move files to /var/www with sudo
+          ssh -p 8822 superadmin@62.72.13.2 "mkdir -p /home/superadmin/temp_deploy/"
+          scp -P 8822 -r dist/angular_backend/browser/* superadmin@62.72.13.2:/home/superadmin/temp_deploy/
+
+      - name: 🚚 Move files to /var/www/ with sudo
         run: |
           ssh -p 8822 superadmin@62.72.13.2 <<EOF
             sudo mkdir -p /var/www/angular_backend/
             sudo cp -r /home/superadmin/temp_deploy/* /var/www/angular_backend/
             sudo rm -rf /home/superadmin/temp_deploy/
           EOF
-        
 
-      - name: 🔁 Restart NGINX (optional, if needed)
+      - name: 🔁 Restart NGINX
         run: |
           ssh -p 8822 superadmin@62.72.13.2 "sudo systemctl restart nginx"
