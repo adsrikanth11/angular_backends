@@ -19,23 +19,12 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p 8822 62.72.13.2 >> ~/.ssh/known_hosts
 
-      - name: 📁 Clone Repo if Not Exists
+      - name: 📤 Upload Angular build via SCP
         run: |
           ssh -p 8822 superadmin@62.72.13.2 << EOF
-            cd ~
-            if [ ! -d "angular_backend" ]; then
-              echo "📦 Cloning repository..."
-              git clone https://${{ secrets.GH_PAT }}@github.com/adsrikanth11/angular_backend.git
-            fi
+            scp -P 8822 -r dist/angular_backend/browser/* superadmin@62.72.13.2:/var/www/angular_backend/
           EOF
 
-      - name: 📥 Pull Latest Code
-        run: |
-          ssh -p 8822 superadmin@62.72.13.2 << EOF
-            cd ~/angular_backend
-            git pull origin main
-          EOF
-
-      - name: 🚀 Start or Restart App with PM2
+      - name: 🔁 Restart NGINX (optional, if needed)
         run: |
           ssh -p 8822 superadmin@62.72.13.2 "sudo systemctl restart nginx"
