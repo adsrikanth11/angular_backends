@@ -23,13 +23,13 @@ jobs:
       - name: 📤 Upload dist to temp folder on VPS
         run: |
           ssh -p 8822 superadmin@62.72.13.2 "mkdir -p /home/superadmin/temp_deploy/"
-          scp -P 8822 -r dist/angular_backend/browser/* superadmin@62.72.13.2:/home/superadmin/temp_deploy/
+          scp -P 8822 -r dist/angular_backends/browser/* superadmin@62.72.13.2:/home/superadmin/temp_deploy/
 
       - name: 🚚 Move files to /var/www/ with sudo
         run: |
           ssh -p 8822 superadmin@62.72.13.2 <<EOF
-            sudo mkdir -p /var/www/angular_backend/
-            sudo cp -r /home/superadmin/temp_deploy/* /var/www/angular_backend/
+            sudo mkdir -p /var/www/angular_backends/
+            sudo cp -r /home/superadmin/temp_deploy/* /var/www/angular_backends/
             sudo rm -rf /home/superadmin/temp_deploy/
           EOF
 
